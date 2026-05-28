@@ -1,0 +1,41 @@
+name: generate-contribution-snake-animation
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shared-execution-lock
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
+      - uses: luiz1361/snk@e2cedf76a2c05b25d09a6428ded69727b497a700 # ratchet:luiz1361/snk@v3.4.1
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            github-snake.svg
+            github-snake-dark.svg?palette=github-dark
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          mkdir -p contribution-snake-animation
+          mv github-snake.svg contribution-snake-animation/light.svg
+          mv github-snake-dark.svg contribution-snake-animation/dark.svg
+          git add -A .
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "ci: generate-contribution-snake-animation"
+            git push
+          fi

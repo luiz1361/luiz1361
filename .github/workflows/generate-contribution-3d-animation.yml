@@ -1,0 +1,38 @@
+name: generate-contribution-3d-animation
+
+on:
+  schedule:
+    - cron: "10 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shared-execution-lock
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
+      - uses: luiz1361/github-profile-3d-contrib@208d8215bd117497a02c94f559f94474ba23819c # ratchet:luiz1361/github-profile-3d-contrib@v0.9.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          mkdir -p contribution-3d-animation
+          mv profile-3d-contrib/profile-night-green.svg contribution-3d-animation/dark.svg
+          mv profile-3d-contrib/profile-green.svg contribution-3d-animation/light.svg
+          rm -rf profile-3d-contrib
+          git add -A .
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "ci: generate-contribution-3d-animation"
+            git push
+          fi
