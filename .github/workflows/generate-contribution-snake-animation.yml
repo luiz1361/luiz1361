@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v7.0.1
       - uses: luiz1361/snk@a041d6c27ba561a39f5be9c26a784812765e434b # ratchet:luiz1361/snk@v3.5.0
         with:
           github_user_name: ${{ github.repository_owner }}
